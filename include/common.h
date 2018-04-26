@@ -1,6 +1,9 @@
 #ifndef _QT_TOX_COMMON_H_
 #define _QT_TOX_COMMON_H_
 
+namespace QtTox
+{
+
 static constexpr uint32_t PublicKeySize;
 static constexpr uint32_t SecretKeySize;
 static constexpr uint32_t NospamSize;
@@ -35,5 +38,7 @@ enum class MesageType
     Normal,
     Action,
 };
+
+}
 
 #endif // _QT_TOX_COMMON_H_
