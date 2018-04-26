@@ -27,5 +27,8 @@ pkg_search_module(TOXAV          REQUIRED toxav)
 pkg_search_module(TOXENCRYPTSAVE REQUIRED toxencryptsave)
 
 target_link_libraries(libqttox Qt5::Core)
-include_directories("${CMAKE_SOURCE_DIR}/include")
+include_directories(
+        "${CMAKE_SOURCE_DIR}/include"
+        "${CMAKE_SOURCE_DIR}/src"
+        )
 

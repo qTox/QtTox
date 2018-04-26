@@ -1,4 +1,7 @@
 #include "chatlist.h"
+
+#include "datahelper.h"
+#include "fillerror.h"
 #include "toxstring.h"
 
 #include <tox/tox.h>
@@ -8,75 +11,73 @@
 
 namespace
 {
+
 template<class ToxErr, class Err>
-void fillError(ToxErr toxErr, Err* err, const QMap<ToxErr, Err>& map)
+void fillErrFriendAdd(ToxErr toxErr, Err* err)
 {
-    if (!err) {
-        return;
-    }
-
-    *err = map[toxErr];
-}
-
-using ErrFriendAdd = QtTox::ChatList::ErrFriendAdd;
-void fillErrFriendAdd(TOX_ERR_FRIEND_ADD toxErr, ErrFriendAdd* err)
-{
+#define ERR(toxName, qtName) \
+    { TOX_ERR_FRIEND_ADD_##toxName, QtTox::ChatList::ErrFriendAdd::qtName }
     fillError(toxErr, err, {
-        { TOX_ERR_FRIEND_ADD_OK,             ErrFriendAdd::Ok },
-        { TOX_ERR_FRIEND_ADD_NULL,           ErrFriendAdd::Null },
-        { TOX_ERR_FRIEND_ADD_TOO_LONG,       ErrFriendAdd::TooLong },
-        { TOX_ERR_FRIEND_ADD_NO_MESSAGE,     ErrFriendAdd::NoMessage },
-        { TOX_ERR_FRIEND_ADD_OWN_KEY,        ErrFriendAdd::OwnKey },
-        { TOX_ERR_FRIEND_ADD_ALREADY_SENT,   ErrFriendAdd::AlreadySent },
-        { TOX_ERR_FRIEND_ADD_BAD_CHECKSUM,   ErrFriendAdd::BadChecksum },
-        { TOX_ERR_FRIEND_ADD_SET_NEW_NOSPAM, ErrFriendAdd::SetNewNospam },
-        { TOX_ERR_FRIEND_ADD_MALLOC,         ErrFriendAdd::Malloc },
+        ERR(OK,             Ok),
+        ERR(NULL,           Null),
+        ERR(TOO_LONG,       TooLong),
+        ERR(NO_MESSAGE,     NoMessage),
+        ERR(OWN_KEY,        OwnKey),
+        ERR(ALREADY_SENT,   AlreadySent),
+        ERR(BAD_CHECKSUM,   BadChecksum),
+        ERR(SET_NEW_NOSPAM, SetNewNospam),
+        ERR(MALLOC,         Malloc),
     });
+#undef ERR
 }
 
-using ErrFriendDelete = QtTox::ChatList::ErrFriendDelete;
-void fillErrFriendDelete(TOX_ERR_FRIEND_DELETE toxErr, ErrFriendDelete* err)
+template<class ToxErr, class Err>
+void fillErrFriendDelete(ToxErr toxErr, Err* err)
 {
+#define ERR(toxName, qtName) \
+    { TOX_ERR_FRIEND_DELETE_##toxName, QtTox::ChatList::ErrFriendDelete::qtName }
     fillError(toxErr, err, {
-        { TOX_ERR_FRIEND_DELETE_OK,               ErrFriendDelete::Ok },
-        { TOX_ERR_FRIEND_DELETE_FRIEND_NOT_FOUND, ErrFriendDelete::FriendNotFound },
+        ERR(OK,               Ok),
+        ERR(FRIEND_NOT_FOUND, FriendNotFound),
     });
+#undef ERR
 }
 
-using ErrFriendByPK = QtTox::ChatList::ErrFriendByPublicKey;
-void fillErrFriendByPublicKey(TOX_ERR_FRIEND_BY_PUBLIC_KEY toxErr,
-        ErrFriendByPK* err)
+template<class ToxErr, class Err>
+void fillErrFriendByPublicKey(ToxErr toxErr, Err* err)
 {
+#define ERR(toxName, qtName) \
+    { TOX_ERR_FRIEND_BY_PUBLIC_KEY_##toxName, Err::qtName }
     fillError(toxErr, err, {
-        { TOX_ERR_FRIEND_BY_PUBLIC_KEY_OK,        ErrFriendByPK::Ok },
-        { TOX_ERR_FRIEND_BY_PUBLIC_KEY_NULL,      ErrFriendByPK::Null },
-        { TOX_ERR_FRIEND_BY_PUBLIC_KEY_NOT_FOUND, ErrFriendByPK::NotFound },
+        ERR(OK,        Ok),
+        ERR(NULL,      Null),
+        ERR(NOT_FOUND, NotFound),
     });
+#undef ERR
 }
 
-using ErrConferenceDelete = QtTox::ChatList::ErrConferenceDelete;
-void fillErrConferenceDelete(TOX_ERR_CONFERENCE_DELETE toxErr,
-        ErrConferenceDelete* err)
+template<class ToxErr, class Err>
+void fillErrConferenceDelete(ToxErr toxErr, Err* err)
 {
+#define ERR(toxName, qtName) \
+    { TOX_ERR_CONFERENCE_DELETE_##toxName, Err::qtName }
     fillError(toxErr, err, {
-        { TOX_ERR_CONFERENCE_DELETE_OK, ErrConferenceDelete::Ok },
-        { TOX_ERR_CONFERENCE_DELETE_CONFERENCE_NOT_FOUND,
-          ErrConferenceDelete::ConferenceNotFound },
+        ERR(OK,                   Ok),
+        ERR(CONFERENCE_NOT_FOUND, ConferenceNotFound),
     });
+#undef ERR
 }
 
-using ErrConferenceNew = QtTox::ChatList::ErrConferenceNew;
-void fillErrConferenceNew(TOX_ERR_CONFERENCE_NEW toxErr, ErrConferenceNew* err)
+template<class ToxErr, class Err>
+void fillErrConferenceNew(ToxErr toxErr, Err* err)
 {
+#define ERR(toxName, qtName) \
+    { TOX_ERR_CONFERENCE_NEW_##toxName, Err::qtName }
     fillError(toxErr, err, {
-        { TOX_ERR_CONFERENCE_NEW_OK,   ErrConferenceNew::Ok },
-        { TOX_ERR_CONFERENCE_NEW_INIT, ErrConferenceNew::Init },
+        ERR(OK,   Ok),
+        ERR(INIT, Init),
     });
-}
-
-const uint8_t* data(const QByteArray& arr)
-{
-    return static_cast<const uint8_t*>(static_cast<const void*>(arr.data()));
+#undef ERR
 }
 
 }
