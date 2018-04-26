@@ -1,13 +1,24 @@
 #ifndef _Q_TOX_MESSENGER_H_
 #define _Q_TOX_MESSENGER_H_
 
+#include "connection.h"
+#include "messagetype.h"
+#include "userstatus.h"
+
+#include <QByteArray>
+#include <QObject>
+#include <QString>
+
 struct Tox;
 
 namespace QtTox
 {
 
-class Messenger
+class Messenger : public QObject
 {
+    Q_OBJECT
+
+public:
     Messenger(struct Tox* tox);
 
     enum class ErrFriendGetPublicKey

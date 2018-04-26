@@ -19,26 +19,6 @@ static constexpr uint32_t MaxFilenameLength;
 static constexpr uint32_t HashLength;
 static constexpr uint32_t FileIdLength;
 
-enum class UserStatus
-{
-    None,
-    Away,
-    Busy,
-};
-
-enum class Connection
-{
-    None,
-    Tcp,
-    Udp,
-};
-
-enum class MesageType
-{
-    Normal,
-    Action,
-};
-
 }
 
 #endif // _QT_TOX_COMMON_H_
