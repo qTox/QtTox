@@ -1,6 +1,8 @@
 #ifndef _QT_TOX_CONFERENCE_H
 #define _QT_TOX_CONFERENCE_H
 
+#include "conferencetype.h"
+
 #include <QObject>
 
 struct Tox;
@@ -12,12 +14,6 @@ class Conference : public QObject
 {
     Q_OBJECT
 public:
-
-    enum class Type
-    {
-        Text,
-        AV,
-    };
 
     Q_SIGNAL void messageReceived(uint32_t conferenceNum, uint32_t peerNum,
             MessageType type, const QString& message);
@@ -91,7 +87,7 @@ public:
         ConferenceNotFound,
     };
 
-    Type getType(uint32_t conferenceNum, ErrGetType* err = nullptr);
+    ConferenceType getType(uint32_t conferenceNum, ErrGetType* err = nullptr);
 
 private:
     struct Tox* tox;

@@ -1,6 +1,8 @@
 #ifndef _QT_TOX_CHAT_LIST_H_
 #define _QT_TOX_CHAT_LIST_H_
 
+#include "conferencetype.h"
+
 #include <QObject>
 
 struct Tox;
@@ -45,9 +47,9 @@ public:
     {
         Ok,
         Null,
-        KeyNotFound,
+        NotFound,
     };
-    uint32_t friendByPublicKey(const QByteArray& publicKey. ErrFriendByPublicKey* err = nullptr) const;
+    uint32_t friendByPublicKey(const QByteArray& publicKey, ErrFriendByPublicKey* err = nullptr) const;
 
     bool friendExists(uint32_t friendNumer) const;
     QVector<uint32_t> getFriendList() const;
@@ -60,7 +62,7 @@ public:
         Init,
     };
     uint32_t conferenceNew(ErrConferenceNew* err = nullptr);
-    Q_SIGNAL void invited(uint32_t conferenceNum, ConferenceType type)
+    Q_SIGNAL void invited(uint32_t conferenceNum, ConferenceType type);
 
     enum class ErrConferenceDelete
     {
@@ -68,7 +70,7 @@ public:
         ConferenceNotFound,
     };
 
-    uint32_t conferenceDelete(uint32_t conferenceNum, ErrConferenceDelete* err = nullptr);
+    bool conferenceDelete(uint32_t conferenceNum, ErrConferenceDelete* err = nullptr);
 
     // Get list of conference numbers
     QVector<uint32_t> getChatlist() const;
