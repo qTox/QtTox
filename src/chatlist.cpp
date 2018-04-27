@@ -2,6 +2,7 @@
 
 #include "datahelper.h"
 #include "fillerror.h"
+#include "services.h"
 #include "toxstring.h"
 
 #include <tox/tox.h>
@@ -80,10 +81,42 @@ void fillErrConferenceNew(ToxErr toxErr, Err* err)
 #undef ERR
 }
 
+void onConferenceInvite(struct Tox*, uint32_t friendNum,
+        TOX_CONFERENCE_TYPE toxType, const uint8_t* toxCookie, size_t length,
+        void* payload)
+{
+    auto services = static_cast<QtTox::Services*>(payload);
+    const auto ptr = static_cast<const char*>(static_cast<const void*>(toxCookie));
+    const auto cookie = QByteArray(ptr, length);
+    const auto map = QMap<TOX_CONFERENCE_TYPE, QtTox::ConferenceType> {
+        { TOX_CONFERENCE_TYPE_TEXT, QtTox::ConferenceType::Text },
+        { TOX_CONFERENCE_TYPE_AV,   QtTox::ConferenceType::AV },
+    };
+    const auto type = map[toxType];
+    emit services->chatList->conferenceInviteReceived(friendNum, type, cookie);
+}
+
+void onFriendRequest(struct Tox*, const uint8_t* cFriendPk,
+        const uint8_t* cMessage, size_t cMessageSize, void* payload)
+{
+    auto services = static_cast<QtTox::Services*>(payload);
+    const auto message = ToxString(cMessage, cMessageSize).getQString();
+    const auto ptr = static_cast<const char*>(static_cast<const void*>(cFriendPk));
+    const auto publicKey = QByteArray(ptr, TOX_PUBLIC_KEY_SIZE);
+    emit services->chatList->friendRequestReceived(publicKey, message);
+}
+
 }
 
 namespace QtTox
 {
+
+ChatList::ChatList(struct Tox* tox)
+    : tox{tox}
+{
+    tox_callback_friend_request(tox, onFriendRequest);
+    tox_callback_conference_invite(tox, onConferenceInvite);
+}
 
 uint32_t ChatList::friendAdd(const QByteArray& address, const QString& message, ErrFriendAdd* err)
 {

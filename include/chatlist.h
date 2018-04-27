@@ -15,6 +15,7 @@ class ChatList : public QObject
     Q_OBJECT
 
 public:
+    ChatList(struct Tox* tox);
 
     // Friend list management
 
@@ -33,7 +34,7 @@ public:
 
     uint32_t friendAdd(const QByteArray& address, const QString& message, ErrFriendAdd* err = nullptr);
     uint32_t friendAddNorequest(const QByteArray& address, ErrFriendAdd* err = nullptr);
-    Q_SIGNAL void friendRequest(const QByteArray& publicKey, const QString& message);
+    Q_SIGNAL void friendRequestReceived(const QByteArray& publicKey, const QString& message);
     
     enum class ErrFriendDelete
     {
@@ -62,7 +63,7 @@ public:
         Init,
     };
     uint32_t conferenceNew(ErrConferenceNew* err = nullptr);
-    Q_SIGNAL void invited(uint32_t conferenceNum, ConferenceType type);
+    Q_SIGNAL void conferenceInviteReceived(uint32_t friendNum, ConferenceType type, const QByteArray& cookie);
 
     enum class ErrConferenceDelete
     {
