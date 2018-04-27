@@ -2,6 +2,7 @@
 
 #include "datahelper.h"
 #include "fillerror.h"
+#include "services.h"
 #include "toxstring.h"
 
 #include <QMap>
@@ -10,6 +11,7 @@
 
 namespace
 {
+
 template<class ToxErr, class Err>
 void fillErrFriendGetPublicKey(ToxErr toxErr, Err* err)
 {
@@ -79,10 +81,90 @@ void fillErrFriendSendMessage(ToxErr toxErr, Err* err)
 #undef ERR
 }
 
+void onFriendName(struct Tox* tox, uint32_t friendNum,
+        const uint8_t* cName, size_t length, void* payload)
+{
+    auto service = static_cast<QtTox::Services*>(payload);
+    const auto name = ToxString(cName, length).getQString();
+    emit service->messenger->friendNameChanged(friendNum, name);
+}
+
+void onFriendStatusMessage(struct Tox* tox, uint32_t friendNum,
+        const uint8_t* cMessage, size_t length, void* payload)
+{
+    auto service = static_cast<QtTox::Services*>(payload);
+    const auto message = ToxString(cMessage, length).getQString();
+    emit service->messenger->friendStatusMessageChanged(friendNum, message);
+}
+
+void onFriendStatus(struct Tox* tox, uint32_t friendNum,
+        TOX_USER_STATUS toxStatus, void* payload)
+{
+    auto service = static_cast<QtTox::Services*>(payload);
+    const auto map = QMap<TOX_USER_STATUS, QtTox::UserStatus> {
+        { TOX_USER_STATUS_NONE, QtTox::UserStatus::None },
+        { TOX_USER_STATUS_BUSY, QtTox::UserStatus::Busy },
+        { TOX_USER_STATUS_AWAY, QtTox::UserStatus::Away },
+    };
+    const auto status = map[toxStatus];
+    emit service->messenger->friendStatusChanged(friendNum, status);
+}
+
+void onFriendConnectionStatus(struct Tox* tox, uint32_t friendNum,
+        TOX_CONNECTION toxStatus, void* payload)
+{
+    auto service = static_cast<QtTox::Services*>(payload);
+    const auto map = QMap<TOX_CONNECTION, QtTox::Connection> {
+        { TOX_CONNECTION_NONE, QtTox::Connection::None },
+        { TOX_CONNECTION_TCP,  QtTox::Connection::TCP },
+        { TOX_CONNECTION_UDP,  QtTox::Connection::UDP },
+    };
+    const auto status = map[toxStatus];
+    emit service->messenger->friendConnectionStatusChanged(friendNum, status);
+}
+
+void onFriendTyping(struct Tox* tox, uint32_t friendNum,
+        bool typing, void* payload)
+{
+    auto service = static_cast<QtTox::Services*>(payload);
+    emit service->messenger->friendTypingChanged(friendNum, typing);
+}
+
+void onFriendReadReceipt(struct Tox* tox, uint32_t friendNum,
+        uint32_t messageId, void* payload)
+{
+    auto service = static_cast<QtTox::Services*>(payload);
+    emit service->messenger->friendReceiptReaded(friendNum, messageId);
+}
+
+void onFriendMessage(struct Tox* tox, uint32_t friendNum,
+        TOX_MESSAGE_TYPE toxType, const uint8_t* cMessage, size_t length,
+        void* payload)
+{
+    auto service = static_cast<QtTox::Services*>(payload);
+    const auto map = QMap<TOX_MESSAGE_TYPE, QtTox::MessageType> {
+        { TOX_MESSAGE_TYPE_NORMAL, QtTox::MessageType::Normal },
+        { TOX_MESSAGE_TYPE_ACTION, QtTox::MessageType::Action },
+    };
+    const auto type = map[toxType];
+    const auto message = ToxString(cMessage, length).getQString();
+    emit service->messenger->friendMessage(friendNum, type, message);
+}
 }
 
 namespace QtTox
 {
+
+Messenger::Messenger(struct Tox* tox)
+{
+    tox_callback_friend_name(tox, onFriendName);
+    tox_callback_friend_status_message(tox, onFriendStatusMessage);
+    tox_callback_friend_status(tox, onFriendStatus);
+    tox_callback_friend_connection_status(tox, onFriendConnectionStatus);
+    tox_callback_friend_typing(tox, onFriendTyping);
+    tox_callback_friend_read_receipt(tox, onFriendReadReceipt);
+    tox_callback_friend_message(tox, onFriendMessage);
+}
 
 QByteArray Messenger::getFriendPublicKey(uint32_t friendNum, ErrFriendGetPublicKey* err) const
 {
@@ -192,7 +274,7 @@ bool Messenger::setSelfTyping(uint32_t friendNum, bool typing, ErrSetTyping* err
     return success;
 }
 
-uint32_t Messenger::friendSendMessage(uint32_t friendNum, MessageType type, 
+uint32_t Messenger::friendSendMessage(uint32_t friendNum, MessageType type,
         const QString& message, ErrFriendSendMessage* err)
 {
     const auto map = QMap<MessageType, TOX_MESSAGE_TYPE> {
