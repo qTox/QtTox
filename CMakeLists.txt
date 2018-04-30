@@ -14,10 +14,16 @@ add_library(libqttox
     include/messenger.h
     include/options.h
     include/self.h
+    include/toxencrypt.h
+    include/toxpk.h
+    include/toxid.h
     include/toxstring.h
     include/version.h
     src/chatlist.cpp
     src/messenger.cpp
+    src/toxencrypt.cpp
+    src/toxpk.cpp
+    src/toxid.cpp
     src/toxstring.cpp
 )
 
@@ -25,8 +31,8 @@ find_package(Qt5Core   REQUIRED)
 find_package(PkgConfig REQUIRED)
 
 pkg_search_module(TOXCORE        REQUIRED toxcore)
-pkg_search_module(TOXAV          REQUIRED toxav)
-pkg_search_module(TOXENCRYPTSAVE REQUIRED toxencryptsave)
+#pkg_search_module(TOXAV          REQUIRED toxav)
+#pkg_search_module(TOXENCRYPTSAVE REQUIRED toxencryptsave)
 
 target_link_libraries(libqttox Qt5::Core)
 include_directories(
