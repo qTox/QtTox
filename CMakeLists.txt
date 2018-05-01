@@ -20,6 +20,7 @@ add_library(libqttox
     include/toxstring.h
     include/version.h
     src/chatlist.cpp
+    src/conference.cpp
     src/messenger.cpp
     src/toxencrypt.cpp
     src/toxpk.cpp

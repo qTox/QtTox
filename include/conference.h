@@ -2,6 +2,7 @@
 #define _QT_TOX_CONFERENCE_H
 
 #include "conferencetype.h"
+#include "messagetype.h"
 
 #include <QObject>
 
@@ -14,6 +15,8 @@ class Conference : public QObject
 {
     Q_OBJECT
 public:
+
+    Conference(struct Tox* tox);
 
     Q_SIGNAL void messageReceived(uint32_t conferenceNum, uint32_t peerNum,
             MessageType type, const QString& message);
@@ -30,10 +33,10 @@ public:
         NoConnection,
     };
 
-    uint32_t getPeerCount(uint32_t conferenceNum, ErrConferencePeerQuery* err = nullptr) const;
-    QString getPeerName(uint32_t conferenceNum, uint32_t peerNum, const QString& name) const;
-    QByteArray getPeerPublicKey(uint32_t conferenceNum, uint32_t peerNum, ErrConferencePeerQuery* err = nullptr) const;
-    bool peerNumberIsOurs(uint32_t conferenceNum, uint32_t peerNum, ErrConferencePeerQuery* err = nullptr) const;
+    uint32_t getPeerCount(uint32_t conferenceNum, ErrPeerQuery* err = nullptr) const;
+    QString getPeerName(uint32_t conferenceNum, uint32_t peerNum, ErrPeerQuery* err = nullptr) const;
+    QByteArray getPeerPublicKey(uint32_t conferenceNum, uint32_t peerNum, ErrPeerQuery* err = nullptr) const;
+    bool peerNumberIsOurs(uint32_t conferenceNum, uint32_t peerNum, ErrPeerQuery* err = nullptr) const;
 
     enum class ErrInvite
     {
@@ -66,14 +69,14 @@ public:
         FailSend,
     };
 
-    bool sendMessage(uint32_t conferenceNum, MessageType type, const Qtring& message,
+    bool sendMessage(uint32_t conferenceNum, MessageType type, const QString& message,
             ErrSendMessage* err = nullptr);
 
 
     enum class ErrTitle
     {
         Ok,
-        NotFound,
+        ConferenceNotFound,
         InvalidLength,
         FailSend,
     };
@@ -91,5 +94,8 @@ public:
 
 private:
     struct Tox* tox;
+};
+
 }
+
 #endif // _QT_TOX_CONFERENCE_H
