@@ -6,11 +6,13 @@ namespace QtTox
 
 class Messenger;
 class ChatList;
+class Files;
 
 struct Services
 {
-    Messenger* messenger;
-    ChatList* chatList;
+    Messenger*  messenger;
+    ChatList*   chatList;
+    Files*      files;
 };
 
 }

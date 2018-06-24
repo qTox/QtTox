@@ -21,7 +21,7 @@ public:
         Avatar,
     };
 
-    enum class Control
+    enum class FileControl
     {
         Resume,
         Pause,
@@ -64,7 +64,7 @@ public:
         NotFound,
     };
 
-    QByteArray getFileId(uint32_t fileNum, uint32_t fileNum, ErrFileGet* err = nullptr);
+    QByteArray getFileId(uint32_t friendNum, uint32_t fileNum, ErrFileGet* err = nullptr);
 
     // File transmission: sending
 
@@ -78,8 +78,7 @@ public:
         TooMany,
     };
 
-    // TODO: What is kind??
-    uint32_t fileSend(uint32_t friendNum, uint32_t kind, uint64_t file_size, const QByteArray& fileId,
+    uint32_t fileSend(uint32_t friendNum, FileKind kind, uint64_t file_size, const QByteArray& fileId,
             const QString& filename, ErrFileSend* err = nullptr);
 
     enum class ErrFileSendChunk
@@ -96,17 +95,18 @@ public:
     };
 
     bool fileSendChunk(uint32_t friendNum, uint32_t fileNum, uint32_t position,
-            const QByteArray& data, ErrFileSendChunk&* err = nullptr);
+            const QByteArray& data, ErrFileSendChunk* err = nullptr);
 
-    Q_SIGNAL void fileChunkRequest(uint32_t friendNum, uint32_t fileNum, uint32_t position, size_t length);
+    Q_SIGNAL void fileChunkRequest(uint32_t friendNum, uint32_t fileNum, uint64_t position, size_t length);
 
     // File transmission: receiving
     
-    Q_SIGNAL void fileReceived(uint32_t friendNum, uint32_t fileNum, uint32_t kind,
+    Q_SIGNAL void fileReceived(uint32_t friendNum, uint32_t fileNum, FileKind kind,
             uint64_t fileSize, const QString& filename);
-    Q_SIGNAL void fileChunkReceived(uint32_t friendNum, uint32_t fileNum, uint32_t position,
+    Q_SIGNAL void fileChunkReceived(uint32_t friendNum, uint32_t fileNum, uint64_t position,
             const QByteArray& data);
 
+    Files(Tox *tox);
 private:
     struct Tox* tox;
 };

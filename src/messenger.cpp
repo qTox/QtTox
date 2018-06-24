@@ -164,6 +164,7 @@ Messenger::Messenger(struct Tox* tox)
     tox_callback_friend_typing(tox, onFriendTyping);
     tox_callback_friend_read_receipt(tox, onFriendReadReceipt);
     tox_callback_friend_message(tox, onFriendMessage);
+    this->tox = tox;
 }
 
 QByteArray Messenger::getFriendPublicKey(uint32_t friendNum, ErrFriendGetPublicKey* err) const

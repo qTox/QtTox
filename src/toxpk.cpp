@@ -5,6 +5,9 @@
 #include <QByteArray>
 #include <QString>
 
+namespace QtTox
+{
+
 /**
  * @class ToxPk
  * @brief This class represents a Tox Public Key, which is a part of Tox ID.
@@ -119,4 +122,6 @@ bool ToxPk::isEmpty() const
 int ToxPk::getPkSize()
 {
     return TOX_PUBLIC_KEY_SIZE;
+}
+
 }

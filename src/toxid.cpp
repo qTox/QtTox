@@ -35,6 +35,9 @@
 #define CHECKSUM_HEX_CHARS (2 * CHECKSUM_BYTES)
 #define TOXID_HEX_CHARS (2 * TOX_ADDRESS_SIZE)
 
+namespace QtTox
+{
+
 const QRegularExpression ToxId::ToxIdRegEx(QString("(^|\\s)[A-Fa-f0-9]{%1}($|\\s)").arg(TOXID_HEX_CHARS));
 
 /**
@@ -252,4 +255,6 @@ bool ToxId::isValid() const
     }
 
     return calculated == checksum;
+}
+
 }

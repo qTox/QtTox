@@ -32,6 +32,9 @@ static QString getEncryptionError(TOX_ERR_ENCRYPTION error);
 static QString getDecryptionError(TOX_ERR_DECRYPTION error);
 static QString getSaltError(TOX_ERR_GET_SALT error);
 
+namespace QtTox
+{
+
 /**
   * @class ToxEncrypt
   * @brief Encapsulates the toxencrypsave API.
@@ -274,6 +277,8 @@ QByteArray ToxEncrypt::decrypt(const QByteArray& ciphertext) const
     }
 
     return plaintext;
+}
+
 }
 
 /**
